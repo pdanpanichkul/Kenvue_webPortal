@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vendor Portal Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen">
+
+  <section class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-md p-8 w-full max-w-md">
+
+      <div class="text-center mb-8">
+        <div class="inline-flex bg-blue-600 text-white p-3 rounded-xl mb-3">
+          <i data-lucide="shield-check" class="w-8 h-8"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900">Vendor Portal Login</h1>
+        <p class="text-sm text-slate-500 mt-1">Sign in to manage purchase orders and documents</p>
+      </div>
+
+      <!-- Error/logout banners driven by query params Spring Security adds -->
+      <div th:if="${param.error}" class="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm font-medium">
+        Invalid vendor ID/email or password.
+      </div>
+      <div th:if="${param.logout}" class="mb-4 p-3 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-medium">
+        You have been logged out.
+      </div>
+
+      <!-- Posts to /login, handled entirely by Spring Security - no JS needed -->
+      <form th:action="@{/login}" method="post" class="space-y-4">
+        <div>
+          <label for="vendorCode" class="block text-sm font-semibold text-slate-700 mb-1">Vendor ID / Email</label>
+          <input type="text" id="vendorCode" name="vendorCode" required
+                 class="w-full p-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                 placeholder="e.g., VEND-8891 or vendor@abc.com" />
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-semibold text-slate-700 mb-1">Password</label>
+          <input type="password" id="password" name="password" required
+                 class="w-full p-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                 placeholder="••••••••" />
+        </div>
+
+        <button type="submit" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="log-in" class="w-4 h-4"></i> Sign In
+        </button>
+      </form>
+
+      <p class="text-xs text-slate-400 text-center mt-6">Demo login: VEND-8891 / password123</p>
+    </div>
+  </section>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+/* Place any custom CSS overrides here that go beyond Tailwind's utility classes. */
+body {
+  -webkit-font-smoothing: antialiased;
+}

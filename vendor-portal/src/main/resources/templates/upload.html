@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Documents</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen relative pb-12">
+
+  <div th:replace="~{fragments/header :: appHeader}"></div>
+
+  <section class="max-w-5xl mx-auto px-4 mt-6">
+
+    <a th:href="@{/summary}" class="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Summary
+    </a>
+
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6">
+      <div class="border-b border-slate-100 pb-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Target Order</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+            <span th:text="${po.poReference}">PO-2026-00982</span>
+            <span class="text-xs bg-slate-100 text-slate-600 font-normal px-2 py-1 rounded">Standard PO</span>
+          </h2>
+        </div>
+        <div class="text-left sm:text-right">
+          <span class="text-xs text-slate-500 block">Submission Deadline</span>
+          <span class="text-sm font-bold text-red-600 flex items-center sm:justify-end gap-1">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span th:text="${#temporals.format(po.deadline, 'MMM dd, yyyy')}">Sep 15, 2026</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+          <span class="text-xs text-slate-500 block mb-0.5">Vendor Name</span>
+          <span class="font-semibold text-slate-700" th:text="${po.vendor.companyName}">ABC Logistics Co., Ltd.</span>
+        </div>
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+          <span class="text-xs text-slate-500 block mb-0.5">Issuer / Buyer</span>
+          <span class="font-semibold text-slate-700" th:text="${po.issuerName}">Global Tech Corp Thailand</span>
+        </div>
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+          <span class="text-xs text-slate-500 block mb-0.5">PO Status</span>
+          <span class="font-semibold text-emerald-600 flex items-center gap-1">
+            <i data-lucide="check-circle" class="w-4 h-4"></i> Approved & Active
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <form th:action="@{/po/{ref}/upload(ref=${po.poReference})}" method="post" enctype="multipart/form-data" class="space-y-4">
+
+      <!-- ITEM 1: Invoice -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-bold text-slate-900">1. Commercial / Tax Invoice</h3>
+              <span class="bg-red-50 text-red-600 text-xs px-2 py-0.5 rounded font-medium">Required</span>
+            </div>
+            <p class="text-xs text-slate-500">Official tax invoice with complete company address and Tax ID matching the PO.</p>
+          </div>
+          <span class="status-badge inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 self-start">Status: Not Attached</span>
+        </div>
+        <label class="dropzone flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <div class="flex flex-col items-center justify-center pt-5 pb-6">
+            <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mb-2"></i>
+            <p class="text-sm text-slate-600 mb-1"><span class="font-semibold text-blue-600">Click to upload</span> or drag and drop</p>
+            <p class="file-name text-xs text-slate-400">PDF, PNG, JPG (MAX. 10MB)</p>
+          </div>
+          <input type="file" name="invoice" class="hidden file-input" accept=".pdf,.png,.jpg,.jpeg" />
+        </label>
+      </div>
+
+      <!-- ITEM 2: Packing List / Delivery Order -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-bold text-slate-900">2. Packing List</h3>
+              <span class="bg-red-50 text-red-600 text-xs px-2 py-0.5 rounded font-medium">Required</span>
+            </div>
+            <p class="text-xs text-slate-500">Signed delivery receipt or proof of goods handover signed by warehouse personnel.</p>
+          </div>
+          <span class="status-badge inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 self-start">Status: Not Attached</span>
+        </div>
+        <label class="dropzone flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <div class="flex flex-col items-center justify-center pt-5 pb-6">
+            <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mb-2"></i>
+            <p class="text-sm text-slate-600 mb-1"><span class="font-semibold text-blue-600">Click to upload</span> or drag and drop</p>
+            <p class="file-name text-xs text-slate-400">PDF, PNG, JPG (MAX. 10MB)</p>
+          </div>
+          <input type="file" name="deliveryOrder" class="hidden file-input" accept=".pdf,.png,.jpg,.jpeg" />
+        </label>
+      </div>
+
+      <!-- ITEM 3: COA -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-bold text-slate-900">3. Certificate of Analysis (COA) / Test Report</h3>
+              <span class="bg-red-50 text-red-600 text-xs px-2 py-0.5 rounded font-medium">Required</span>
+            </div>
+            <p class="text-xs text-slate-500">Quality/testing document confirming the goods meet the agreed specification.</p>
+          </div>
+          <span class="status-badge inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 self-start">Status: Not Attached</span>
+        </div>
+        <label class="dropzone flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <div class="flex flex-col items-center justify-center pt-5 pb-6">
+            <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mb-2"></i>
+            <p class="text-sm text-slate-600 mb-1"><span class="font-semibold text-blue-600">Click to upload</span> or drag and drop</p>
+            <p class="file-name text-xs text-slate-400">PDF, PNG, JPG (MAX. 10MB)</p>
+          </div>
+          <input type="file" name="coa" class="hidden file-input" accept=".pdf,.png,.jpg,.jpeg" />
+        </label>
+      </div>
+
+      <!-- ITEM 4: Other (Optional) -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-bold text-slate-900">4. ETC</h3>
+              <span class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded font-medium">Optional</span>
+            </div>
+            <p class="text-xs text-slate-500">Attach any other supporting document if applicable to this order.</p>
+          </div>
+          <span class="status-badge inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 self-start">Status: Optional</span>
+        </div>
+        <label class="dropzone flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <div class="flex flex-col items-center justify-center pt-5 pb-6">
+            <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mb-2"></i>
+            <p class="text-sm text-slate-600 mb-1"><span class="font-semibold text-blue-600">Click to upload</span> or drag and drop</p>
+            <p class="file-name text-xs text-slate-400">PDF (MAX. 10MB)</p>
+          </div>
+          <input type="file" name="other" class="hidden file-input" accept=".pdf" />
+        </label>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <label for="remarks" class="block font-bold text-slate-900 mb-1 text-sm">Additional Remarks / Notes</label>
+        <p class="text-xs text-slate-500 mb-3">Provide any relevant reference numbers, payment note, or context for the finance team.</p>
+        <textarea id="remarks" name="remarks" rows="3" class="w-full p-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="e.g., Invoice number INV-2026-991, delivered on Sep 10..."></textarea>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-xs text-slate-500 flex items-center gap-1.5">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+          Encrypted & Secure File Transmission
+        </div>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <a th:href="@{/summary}" class="w-1/2 sm:w-auto text-center px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-medium text-sm hover:bg-slate-50 transition-colors">
+            Cancel
+          </a>
+          <button type="submit" class="w-1/2 sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
+            <i data-lucide="send" class="w-4 h-4"></i> Submit Documents
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </section>
+
+  <script>lucide.createIcons();</script>
+  <script th:src="@{/js/upload.js}"></script>
+</body>
+</html>
