@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Portal - Vendor Document Management System</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons Library -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen relative pb-12">
+
+  <!-- ==========================================
+       VIEW 1: ADMIN LOGIN PAGE
+       ========================================== -->
+  <section id="view-login" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-md p-8 w-full max-w-md">
+      
+      <div class="text-center mb-8">
+        <div class="inline-flex bg-slate-900 text-white p-3 rounded-xl mb-3">
+          <i data-lucide="shield-alert" class="w-8 h-8"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900">Admin Portal Login</h1>
+        <p class="text-sm text-slate-500 mt-1">Shipment document portal for admin</p>
+      </div>
+
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label for="adminUsername" class="block text-sm font-semibold text-slate-700 mb-1">Username / Email</label>
+          <input type="text" id="adminUsername" required class="w-full p-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="admin@company.com" />
+        </div>
+
+        <div>
+          <label for="adminPassword" class="block text-sm font-semibold text-slate-700 mb-1">Password</label>
+          <input type="password" id="adminPassword" required class="w-full p-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="password123" />
+        </div>
+
+        <button type="submit" class="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="log-in" class="w-4 h-4"></i> เข้าสู่ระบบ
+        </button>
+      </form>
+    </div>
+  </section>
+
+
+  <!-- ==========================================
+       SHARED HEADER (Hidden on Login)
+       ========================================== -->
+  <header id="app-header" class="hidden bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-10">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-600 p-2 rounded-lg">
+          <i data-lucide="file-check" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-base leading-tight">Admin Portal</h1>
+          <p class="text-xs text-slate-400">Vendor Document Management System</p>
+        </div>
+      </div>
+
+      <button id="logoutBtn" class="text-xs font-semibold text-slate-300 hover:text-red-400 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-red-400 transition-colors">
+        <i data-lucide="log-out" class="w-4 h-4"></i> log-out
+      </button>
+    </div>
+  </header>
+
+
+  <!-- ==========================================
+       VIEW 2: DOCUMENT APPROVAL DASHBOARD
+       ========================================== -->
+  <section id="view-dashboard" class="hidden max-w-6xl mx-auto px-4 py-8">
+    
+    <!-- Top Bar & Actions -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900">Document Approval Dashboard</h2>
+        <p class="text-sm text-slate-500">ตารางรายการเอกสารที่ Vendor ส่งเข้ามาเพื่อรอการตรวจสอบและอนุมัติ</p>
+      </div>
+      
+      <!-- Buttons to View 4 & View 5 -->
+      <div class="flex items-center gap-3">
+        <button onclick="navigateTo('createRequest')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-lg shadow-sm transition-colors flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i> Create Request Document
+        </button>
+        <button onclick="navigateTo('vendorMaster')" class="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium text-xs rounded-lg shadow-sm transition-colors flex items-center gap-2">
+          <i data-lucide="database" class="w-4 h-4"></i> Manage Vendor Master
+        </button>
+      </div>
+    </div>
+
+    <!-- Submissions Table -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-600">
+          <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold uppercase text-xs">
+            <tr>
+              <th class="px-6 py-4">Supplier Code / Name</th>
+              <th class="px-6 py-4">PO Ref.</th>
+              <th class="px-6 py-4">Submitted Date</th>
+              <th class="px-6 py-4">Submitted Docs</th>
+              <th class="px-6 py-4">Status</th>
+              <th class="px-6 py-4 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            
+            <!-- Pending Row 1 -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4">
+                <div class="font-bold text-slate-900">785124</div>
+                <div class="text-xs text-slate-500">ABC Company Ltd.</div>
+              </td>
+              <td class="px-6 py-4 font-semibold text-slate-800">PO-2026-00982</td>
+              <td class="px-6 py-4">Sep 10, 2026</td>
+              <td class="px-6 py-4">Invoice, DO, COA</td>
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                  <i data-lucide="clock" class="w-3 h-3 mr-1"></i> Pending Review
+                </span>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button onclick="openReviewModal('785124', 'ABC Company Ltd.', 'PO-2026-00982')" class="px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-100 font-semibold text-xs rounded-lg transition-colors inline-flex items-center gap-1">
+                  <i data-lucide="file-search" class="w-3.5 h-3.5"></i> Review & Approve
+                </button>
+              </td>
+            </tr>
+
+            <!-- Pending Row 2 -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4">
+                <div class="font-bold text-slate-900">785324</div>
+                <div class="text-xs text-slate-500">ABZ Cooperation</div>
+              </td>
+              <td class="px-6 py-4 font-semibold text-slate-800">PO-2026-01104</td>
+              <td class="px-6 py-4">Sep 11, 2026</td>
+              <td class="px-6 py-4">Invoice, Delivery Order</td>
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                  <i data-lucide="clock" class="w-3 h-3 mr-1"></i> Pending Review
+                </span>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button onclick="openReviewModal('785324', 'ABZ Cooperation', 'PO-2026-01104')" class="px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-100 font-semibold text-xs rounded-lg transition-colors inline-flex items-center gap-1">
+                  <i data-lucide="file-search" class="w-3.5 h-3.5"></i> Review & Approve
+                </button>
+              </td>
+            </tr>
+
+            <!-- Approved Row -->
+            <tr class="hover:bg-slate-50 transition-colors bg-emerald-50/20">
+              <td class="px-6 py-4">
+                <div class="font-bold text-slate-900">991002</div>
+                <div class="text-xs text-slate-500">Global Logistics Corp</div>
+              </td>
+              <td class="px-6 py-4 font-semibold text-slate-800">PO-2026-00754</td>
+              <td class="px-6 py-4">Aug 30, 2026</td>
+              <td class="px-6 py-4">Invoice, DO</td>
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                  <i data-lucide="check-circle" class="w-3 h-3 mr-1"></i> Approved
+                </span>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button onclick="openReviewModal('991002', 'Global Logistics Corp', 'PO-2026-00754', true)" class="px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold text-xs rounded-lg transition-colors inline-flex items-center gap-1">
+                  <i data-lucide="eye" class="w-3.5 h-3.5"></i> View Details
+                </button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==========================================
+       VIEW 3: DOCUMENT REVIEW DETAIL / MODAL
+       ========================================== -->
+  <div id="review-modal-overlay" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 transition-opacity"></div>
+  
+  <div id="review-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-900 text-white">
+        <div>
+          <h3 class="font-bold text-lg">Document Review Detail</h3>
+          <p id="modal-sub-header" class="text-xs text-slate-300">Supplier Code: 785124 | PO-2026-00982</p>
+        </div>
+        <button onclick="closeReviewModal()" class="text-slate-400 hover:text-white p-1 rounded-md transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-6">
+        
+        <!-- Info Cards Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+          <div>
+            <span class="text-slate-500 block">Supplier Name</span>
+            <span id="modal-supplier-name" class="font-bold text-slate-800 text-sm">ABC Company Ltd.</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block">PO Reference</span>
+            <span id="modal-po-no" class="font-bold text-slate-800 text-sm">PO-2026-00982</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block">Submission Date</span>
+            <span class="font-bold text-slate-800 text-sm">Sep 10, 2026</span>
+          </div>
+        </div>
+
+        <!-- Attached Documents List -->
+        <div>
+          <h4 class="font-bold text-sm text-slate-900 mb-3 flex items-center gap-2">
+            <i data-lucide="paperclip" class="w-4 h-4 text-blue-600"></i> รายการเอกสารที่แนบมา
+          </h4>
+          
+          <div class="space-y-2">
+            <div class="flex items-center justify-between p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+              <div class="flex items-center gap-3">
+                <i data-lucide="file-text" class="w-5 h-5 text-blue-600"></i>
+                <div>
+                  <p class="text-xs font-bold text-slate-800">1. Commercial / Tax Invoice</p>
+                  <p class="text-[11px] text-slate-500">INV-2026-0901.pdf (1.2 MB)</p>
+                </div>
+              </div>
+              <button class="text-xs text-blue-600 hover:underline flex items-center gap-1 font-semibold">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i> เปิดดูเอกสาร
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+              <div class="flex items-center gap-3">
+                <i data-lucide="file-text" class="w-5 h-5 text-blue-600"></i>
+                <div>
+                  <p class="text-xs font-bold text-slate-800">2. Delivery Order (DO)</p>
+                  <p class="text-[11px] text-slate-500">DO-88910.pdf (840 KB)</p>
+                </div>
+              </div>
+              <button class="text-xs text-blue-600 hover:underline flex items-center gap-1 font-semibold">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i> เปิดดูเอกสาร
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+              <div class="flex items-center gap-3">
+                <i data-lucide="file-text" class="w-5 h-5 text-blue-600"></i>
+                <div>
+                  <p class="text-xs font-bold text-slate-800">3. Certificate of Analysis (COA)</p>
+                  <p class="text-[11px] text-slate-500">COA-LOT992.pdf (2.1 MB)</p>
+                </div>
+              </div>
+              <button class="text-xs text-blue-600 hover:underline flex items-center gap-1 font-semibold">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i> เปิดดูเอกสาร
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reject Reason Field -->
+        <div>
+          <label for="rejectReason" class="block font-bold text-xs text-slate-700 mb-1">หมายเหตุ / เหตุผลการปฏิเสธ (กรณี Reject)</label>
+          <textarea id="rejectReason" rows="2" class="w-full p-2.5 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-red-500 placeholder-slate-400" placeholder="ระบุเหตุผล เช่น เอกสารไม่ชัดเจน, Tax ID ไม่ถูกต้อง..."></textarea>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer Action Buttons -->
+      <div id="modal-actions" class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+        <button onclick="closeReviewModal()" class="px-4 py-2 border border-slate-300 hover:bg-slate-200 text-slate-700 font-medium text-xs rounded-lg transition-colors">
+          ยกเลิก / ปิด
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button onclick="handleDecision('reject')" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium text-xs rounded-lg shadow-sm transition-colors flex items-center gap-1.5">
+            <i data-lucide="x-circle" class="w-4 h-4"></i> Reject (ไม่อนุมัติ)
+          </button>
+          <button onclick="handleDecision('approve')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs rounded-lg shadow-sm transition-colors flex items-center gap-1.5">
+            <i data-lucide="check-circle" class="w-4 h-4"></i> Approve (อนุมัติ)
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ==========================================
+       VIEW 4: CREATE REQUEST DOCUMENT LIST
+       ========================================== -->
+  <section id="view-create-request" class="hidden max-w-3xl mx-auto px-4 py-8">
+    
+    <button onclick="navigateTo('dashboard')" class="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> กลับไปหน้า Dashboard
+    </button>
+
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+      <div class="border-b border-slate-100 pb-4 mb-6">
+        <h2 class="text-xl font-bold text-slate-900">Create Request Document List</h2>
+        <p class="text-xs text-slate-500 mt-0.5">สร้างรายการร้องขอเอกสารไปยัง Vendor พร้อมกำหนดเงื่อนไขและวันส่งมอบ</p>
+      </div>
+
+      <form id="createRequestForm" class="space-y-5">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <!-- Supplier Code Auto-Suggest -->
+          <div class="relative">
+            <label for="reqSupplierCode" class="block text-xs font-bold text-slate-700 mb-1">Supplier Code *</label>
+            <input type="text" id="reqSupplierCode" autocomplete="off" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="พิมพ์เพื่อค้นหา เช่น 785" />
+            <!-- Suggestion Box -->
+            <div id="codeSuggestBox" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto divide-y divide-slate-100"></div>
+          </div>
+
+          <!-- Supplier Name Auto-Suggest -->
+          <div class="relative">
+            <label for="reqSupplierName" class="block text-xs font-bold text-slate-700 mb-1">Supplier Name *</label>
+            <input type="text" id="reqSupplierName" autocomplete="off" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="พิมพ์เพื่อค้นหา เช่น AB" />
+            <!-- Suggestion Box -->
+            <div id="nameSuggestBox" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto divide-y divide-slate-100"></div>
+          </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- PO Number -->
+          <div>
+            <label for="reqPO" class="block text-xs font-bold text-slate-700 mb-1">Purchase Order (PO) *</label>
+            <input type="text" id="reqPO" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. PO-2026-XXXXX" />
+          </div>
+
+          <!-- Delivery Date -->
+          <div>
+            <label for="reqDeliveryDate" class="block text-xs font-bold text-slate-700 mb-1">Delivery Date *</label>
+            <input type="date" id="reqDeliveryDate" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+        </div>
+
+        <!-- Requirement Document Checkboxes -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-2">Requirement Document (เลือกเอกสารที่ต้องการ) *</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="reqDocs" value="Tax Invoice" checked class="rounded text-blue-600 focus:ring-blue-500" /> Commercial / Tax Invoice
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="reqDocs" value="Delivery Order" checked class="rounded text-blue-600 focus:ring-blue-500" /> Delivery Order (DO)
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="reqDocs" value="COA" class="rounded text-blue-600 focus:ring-blue-500" /> Certificate of Analysis (COA)
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="reqDocs" value="Test Report" class="rounded text-blue-600 focus:ring-blue-500" /> Quality Test Report
+            </label>
+          </div>
+        </div>
+
+        <!-- Requirement Due Date -->
+        <div>
+          <label for="reqDueDate" class="block text-xs font-bold text-slate-700 mb-1">Requirement Due Date (กำหนดส่งเอกสาร) *</label>
+          <input type="date" id="reqDueDate" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <!-- Submit Bar -->
+        <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
+          <button type="button" onclick="navigateTo('dashboard')" class="px-5 py-2.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+            ยกเลิก
+          </button>
+          <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-lg shadow-sm transition-colors flex items-center gap-1.5">
+            <i data-lucide="send" class="w-4 h-4"></i> ส่งคำขอ (Create Request)
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </section>
+
+
+  <!-- ==========================================
+       VIEW 5: UPDATE VENDOR MASTER DATA
+       ========================================== -->
+  <section id="view-vendor-master" class="hidden max-w-4xl mx-auto px-4 py-8">
+    
+    <button onclick="navigateTo('dashboard')" class="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> กลับไปหน้า Dashboard
+    </button>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- Add New Master Form -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:col-span-1 h-fit">
+        <h3 class="font-bold text-base text-slate-900 mb-1">เพิ่มข้อมูล Vendor Master</h3>
+        <p class="text-xs text-slate-500 mb-4">ข้อมูลส่วนนี้จะถูกนำไปใช้ในระบบ Auto-suggestion บน View 4</p>
+
+        <form id="addVendorForm" class="space-y-4">
+          <div>
+            <label for="newVendorCode" class="block text-xs font-bold text-slate-700 mb-1">Supplier Code</label>
+            <input type="text" id="newVendorCode" required placeholder="เช่น 785999" class="w-full p-2.5 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+
+          <div>
+            <label for="newVendorName" class="block text-xs font-bold text-slate-700 mb-1">Supplier Name</label>
+            <input type="text" id="newVendorName" required placeholder="เช่น ABS Technology Co." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+
+          <button type="submit" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5">
+            <i data-lucide="plus" class="w-4 h-4"></i> บันทึก Vendor Master
+          </button>
+        </form>
+      </div>
+
+      <!-- Current Master Data Table -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:col-span-2">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-base text-slate-900">รายการ Vendor Master ทั้งหมด</h3>
+          <span id="vendor-count" class="text-xs font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">0 รายการ</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold uppercase">
+              <tr>
+                <th class="px-4 py-3">Supplier Code</th>
+                <th class="px-4 py-3">Supplier Name</th>
+                <th class="px-4 py-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="vendor-master-tbody" class="divide-y divide-slate-100">
+              <!-- Dynamically populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ==========================================
+       JAVASCRIPT LOGIC
+       ========================================== -->
+  <script>
+    // [1] Icon Initialization
+    lucide.createIcons();
+
+    // [2] Master Data Management State (สำหรับใช้ Auto-suggest ใน View 4 และจัดการใน View 5)
+    let vendorMasterList = [
+      { code: '785124', name: 'ABC Company Ltd.' },
+      { code: '785324', name: 'ABZ Cooperation' },
+      { code: '785882', name: 'Absolute Supply Co., Ltd.' },
+      { code: '991002', name: 'Global Logistics Corp' }
+    ];
+
+    // [3] View Navigation Routing Logic
+    const views = {
+      login: document.getElementById('view-login'),
+      dashboard: document.getElementById('view-dashboard'),
+      createRequest: document.getElementById('view-create-request'),
+      vendorMaster: document.getElementById('view-vendor-master')
+    };
+    const appHeader = document.getElementById('app-header');
+
+    function navigateTo(targetView) {
+      Object.values(views).forEach(v => v.classList.add('hidden'));
+
+      if (targetView === 'login') {
+        appHeader.classList.add('hidden');
+      } else {
+        appHeader.classList.remove('hidden');
+      }
+
+      if (views[targetView]) {
+        views[targetView].classList.remove('hidden');
+      }
+
+      if (targetView === 'vendorMaster') {
+        renderVendorMasterTable();
+      }
+
+      window.scrollTo(0, 0);
+    }
+
+    // [4] View 3: Review Modal Logic
+    const reviewOverlay = document.getElementById('review-modal-overlay');
+    const reviewModal = document.getElementById('review-modal');
+
+    function openReviewModal(code, name, po, isReadOnly = false) {
+      document.getElementById('modal-sub-header').textContent = `Supplier Code: ${code} | ${po}`;
+      document.getElementById('modal-supplier-name').textContent = name;
+      document.getElementById('modal-po-no').textContent = po;
+      document.getElementById('rejectReason').value = '';
+
+      const actionsDiv = document.getElementById('modal-actions');
+      if (isReadOnly) {
+        actionsDiv.classList.add('hidden');
+      } else {
+        actionsDiv.classList.remove('hidden');
+      }
+
+      reviewOverlay.classList.remove('hidden');
+      reviewModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeReviewModal() {
+      reviewOverlay.classList.add('hidden');
+      reviewModal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    function handleDecision(type) {
+      if (type === 'approve') {
+        alert('อนุมัติเอกสารเรียบร้อยแล้ว');
+      } else {
+        const reason = document.getElementById('rejectReason').value;
+        if (!reason.trim()) {
+          alert('กรุณาระบุเหตุผลการปฏิเสธ (Reject Reason)');
+          return;
+        }
+        alert(`ปฏิเสธเอกสารเรียบร้อยแล้ว\nเหตุผล: ${reason}`);
+      }
+      closeReviewModal();
+    }
+
+    // [5] View 4: Auto-Suggestion Logic (Supplier Code & Name)
+    const codeInput = document.getElementById('reqSupplierCode');
+    const nameInput = document.getElementById('reqSupplierName');
+    const codeSuggestBox = document.getElementById('codeSuggestBox');
+    const nameSuggestBox = document.getElementById('nameSuggestBox');
+
+    // Code Auto-suggest
+    codeInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim().toLowerCase();
+      codeSuggestBox.innerHTML = '';
+      
+      if (!val) {
+        codeSuggestBox.classList.add('hidden');
+        return;
+      }
+
+      const matches = vendorMasterList.filter(item => item.code.toLowerCase().includes(val));
+      if (matches.length > 0) {
+        matches.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'p-2.5 hover:bg-slate-50 cursor-pointer text-xs flex justify-between items-center';
+          div.innerHTML = `<span class="font-bold text-blue-600">${item.code}</span><span class="text-slate-500">${item.name}</span>`;
+          div.onclick = () => {
+            codeInput.value = item.code;
+            nameInput.value = item.name;
+            codeSuggestBox.classList.add('hidden');
+          };
+          codeSuggestBox.appendChild(div);
+        });
+        codeSuggestBox.classList.remove('hidden');
+      } else {
+        codeSuggestBox.classList.add('hidden');
+      }
+    });
+
+    // Name Auto-suggest
+    nameInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim().toLowerCase();
+      nameSuggestBox.innerHTML = '';
+
+      if (!val) {
+        nameSuggestBox.classList.add('hidden');
+        return;
+      }
+
+      const matches = vendorMasterList.filter(item => item.name.toLowerCase().includes(val));
+      if (matches.length > 0) {
+        matches.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'p-2.5 hover:bg-slate-50 cursor-pointer text-xs flex justify-between items-center';
+          div.innerHTML = `<span class="font-bold text-slate-800">${item.name}</span><span class="text-blue-600 font-semibold">${item.code}</span>`;
+          div.onclick = () => {
+            nameInput.value = item.name;
+            codeInput.value = item.code;
+            nameSuggestBox.classList.add('hidden');
+          };
+          nameSuggestBox.appendChild(div);
+        });
+        nameSuggestBox.classList.remove('hidden');
+      } else {
+        nameSuggestBox.classList.add('hidden');
+      }
+    });
+
+    // Hide suggestion boxes on click outside
+    document.addEventListener('click', (e) => {
+      if (!codeInput.contains(e.target)) codeSuggestBox.classList.add('hidden');
+      if (!nameInput.contains(e.target)) nameSuggestBox.classList.add('hidden');
+    });
+
+    // [6] View 5: Vendor Master Data Management Logic
+    function renderVendorMasterTable() {
+      const tbody = document.getElementById('vendor-master-tbody');
+      const countBadge = document.getElementById('vendor-count');
+      tbody.innerHTML = '';
+      countBadge.textContent = `${vendorMasterList.length} รายการ`;
+
+      vendorMasterList.forEach((v, index) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50';
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-bold text-slate-800">${v.code}</td>
+          <td class="px-4 py-3 text-slate-600">${v.name}</td>
+          <td class="px-4 py-3 text-right">
+            <button onclick="deleteVendor(${index})" class="text-red-500 hover:text-red-700 p-1">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    document.getElementById('addVendorForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const code = document.getElementById('newVendorCode').value.trim();
+      const name = document.getElementById('newVendorName').value.trim();
+
+      if (code && name) {
+        vendorMasterList.push({ code, name });
+        document.getElementById('newVendorCode').value = '';
+        document.getElementById('newVendorName').value = '';
+        renderVendorMasterTable();
+        alert('เพิ่มข้อมูล Vendor Master สำเร็จ');
+      }
+    });
+
+    function deleteVendor(index) {
+      if (confirm('คุณต้องการลบรายการ Master นี้ใช่หรือไม่?')) {
+        vendorMasterList.splice(index, 1);
+        renderVendorMasterTable();
+      }
+    }
+
+    // [7] Form Submit Handlers
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      navigateTo('dashboard');
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      navigateTo('login');
+    });
+
+    document.getElementById('createRequestForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('สร้างคำขอเอกสาร (Request Document) เรียบร้อยแล้ว!');
+      navigateTo('dashboard');
+    });
+  </script>
+
+</body>
+</html>
